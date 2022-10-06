@@ -14,16 +14,12 @@ class CampaignMonitorClient:
 
     def __init__(self, config):
         self.config = config
-        self.refresh_access_token()
         self.timezone = self.get_timezone()
         LOGGER.info("Client timezone is {}".format(self.timezone))
 
-    def refresh_access_token(self):
-        LOGGER.info("Refreshing access token")
-        url = "https://api.createsend.com/oauth/token"
-        data = {'grant_type': 'refresh_token', 'refresh_token': self.config['refresh_token']}
-        response = requests.request("POST", url, data=data)
-        self.access_token = response.json()['access_token']
+    def get_authorization(self):
+        return requests.auth.HTTPBasicAuth(self.config.get("api_key"), "x")
+
 
     def get_timezone(self):
         url = (
@@ -41,14 +37,13 @@ class CampaignMonitorClient:
                      params=None, body=None):
 
         LOGGER.info("Making {} request to {}".format(method, url))
+        auth = self.get_authorization()
 
         response = requests.request(
             method,
             url,
-            headers={
-                'Content-Type': 'application/json',
-                'Authorization': "Bearer {}".format(self.access_token)
-            },
+            headers={'Content-Type': 'application/json'},
+            auth=auth,
             params=params,
             json=body)
 

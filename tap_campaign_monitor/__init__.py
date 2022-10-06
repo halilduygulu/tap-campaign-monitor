@@ -107,7 +107,7 @@ def do_sync(args):
 @singer.utils.handle_top_exception(LOGGER)
 def main():
     args = singer.utils.parse_args(
-        required_config_keys=['client_id', 'refresh_token'])
+        required_config_keys=['api_key', 'client_id'])
 
     if args.discover:
         do_discover(args)
